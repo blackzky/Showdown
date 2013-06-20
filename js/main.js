@@ -34,13 +34,24 @@ function writeMessage(messageLayer, message) {
 	context.fillStyle = 'black';
 	context.fillText(message, 10, 25);
 }
+function setState(state){
+	for(i in STATES){
+		CURRENT_STATE = state;
+		if(STATES[i].NAME == CURRENT_STATE){
+			STATES[i].LAYER.show();
+		}else{
+			STATES[i].LAYER.hide();
+		}
+		STATES[i].LAYER.draw();
+	}
+}
 
 var stage;
 var OBJ;
 var messageLayer;
 var circle;
 
-var CURRENT_STATE = "menu";
+var CURRENT_STATE;
 var STATES = {};
 
 function initStage(){
@@ -69,38 +80,42 @@ function initStage(){
 			  padding: 5,
 			  fill: 'black'
 			})).on('mouseup touchend', function(e) {
-				writeMessage(messageLayer, "Button");
+				console.log("goto ingame");
+				setState(STATES.INGAME.NAME);
 			});
-			STATES.MENU.LAYER.add(playButton);
+			this.LAYER.add(playButton);
 		}
 	};
-	STATES.MENU.INIT();
 
-	var circleLayer = new Kinetic.Layer();
+	STATES.INGAME = {
+		NAME : "ingame",	
+		LAYER : new Kinetic.Layer(),
+		INIT : function(){
+			circle = new Kinetic.Circle({
+				x: (stage.getWidth() / 2),
+				y: (stage.getHeight() / 2),
+				radius: 70,
+				fill: 'red',
+				stroke: 'black',
+				strokeWidth: 4
+			}).on('mousedown touchstart', function(e) {
+				OBJ = this;
+				writeMessage(messageLayer, "Circle: mousedown or touchstart");
+				console.log("goto menu");
+				setState(STATES.MENU.NAME);
+			}).on('mouseup touchend', function(e) {
+				writeMessage(messageLayer, "Circle: moveout and touchend");
+			});
+			this.LAYER.add(circle);
+		}
+	};
+	
+
 	messageLayer = new Kinetic.Layer();
-
-	circle = new Kinetic.Circle({
-		x: (stage.getWidth() / 2),
-		y: (stage.getHeight() / 2),
-		radius: 70,
-		fill: 'red',
-		stroke: 'black',
-		strokeWidth: 4
-	});
-
-	circle.on('mousedown touchstart', function(e) {
-		OBJ = this;
-		writeMessage(messageLayer, "Circle: mousedown or touchstart");
-	});
-
-	circle.on('mouseup touchend', function(e) {
-		writeMessage(messageLayer, "Circle: moveout and touchend");
-	});
-
-	circleLayer.add(circle);
-
-	//stage.add(circleLayer);
-	stage.add(STATES.MENU.LAYER);
+	for(i in STATES){
+		STATES[i].INIT();
+		stage.add(STATES[i].LAYER);
+	}
 	stage.add(messageLayer);
 
 	document.addEventListener('mousedown', inputDown, false);
