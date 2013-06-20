@@ -4,10 +4,13 @@ padding:0;
 }
 
 #warning-message { display: none; }
+#container{ display:none; }
 @media only screen and (orientation:portrait){
-#wrapper { display:none; }
-#warning-message { display:block; }
+   #container{ display:none; }
+   #warning-message { display:block; }
 }
 @media only screen and (orientation:landscape){
-#warning-message { display:none; }
+/* swap this later - on deployment*/
+	#container{ display: block; }
+   #warning-message { display:none; }
 }
