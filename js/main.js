@@ -18,7 +18,7 @@ var Device = {
 		}
 	}
 };
-var setScreen = function(){
+function setScreen(){
 	stage.setWidth(Device.width());
 	stage.setHeight(Device.height());
 	stage.setWidth(document.querySelector("body").clientWidth);
@@ -34,16 +34,27 @@ function writeMessage(messageLayer, message) {
 	context.fillStyle = 'black';
 	context.fillText(message, 10, 25);
 }
-function setState(state){
-	for(i in STATES){
-		CURRENT_STATE = state;
-		if(STATES[i].NAME == CURRENT_STATE){
-			STATES[i].LAYER.show();
-		}else{
-			STATES[i].LAYER.hide();
-		}
-		STATES[i].LAYER.draw();
+function setState(state, delay){
+	delay = (typeof(delay) == "undefined" ? 500 : delay);
+	writeMessage(messageLayer, "Loading...");
+	CURRENT_STATE = (typeof(CURRENT_STATE) == "undefined" ? STATES.MENU.NAME : CURRENT_STATE);
+	for(i in STATES[CURRENT_STATE].LAYERS){
+		STATES[CURRENT_STATE].LAYERS[i].clear();
 	}
+	var t = setTimeout(function(){
+		messageLayer.clear();
+		for(i in STATES){
+			CURRENT_STATE = state;
+			for(j in STATES[i].LAYERS){
+				if(STATES[i].NAME == CURRENT_STATE){
+					STATES[i].LAYERS[j].show();
+				}else{
+					STATES[i].LAYERS[j].hide();
+				}
+				STATES[i].LAYERS[j].draw();
+			}
+		}
+	}, delay);
 }
 
 var stage;
@@ -62,9 +73,12 @@ function initStage(){
 	});
 
 	STATES.MENU = {
-		NAME : "menu",
-		LAYER : new Kinetic.Layer(),
+		NAME : "MENU",
+		LAYERS : {
+			HUD : null
+		},
 		INIT : function(){
+			this.LAYERS.HUD = new Kinetic.Layer();
 			var playButton = new Kinetic.Label({
 				x: (stage.getWidth() / 2),
 				y: (stage.getHeight() / 2),
@@ -83,14 +97,16 @@ function initStage(){
 				console.log("goto ingame");
 				setState(STATES.INGAME.NAME);
 			});
-			this.LAYER.add(playButton);
+			this.LAYERS.HUD.add(playButton);
 		}
 	};
-
 	STATES.INGAME = {
-		NAME : "ingame",	
-		LAYER : new Kinetic.Layer(),
+		NAME : "INGAME",	
+		LAYERS : {
+			FIELD : null
+		},
 		INIT : function(){
+			this.LAYERS.FIELD = new Kinetic.Layer();
 			circle = new Kinetic.Circle({
 				x: (stage.getWidth() / 2),
 				y: (stage.getHeight() / 2),
@@ -100,31 +116,33 @@ function initStage(){
 				strokeWidth: 4
 			}).on('mousedown touchstart', function(e) {
 				OBJ = this;
-				writeMessage(messageLayer, "Circle: mousedown or touchstart");
-				console.log("goto menu");
 				setState(STATES.MENU.NAME);
 			}).on('mouseup touchend', function(e) {
 				writeMessage(messageLayer, "Circle: moveout and touchend");
 			});
-			this.LAYER.add(circle);
+			this.LAYERS.FIELD.add(circle);
 		}
 	};
 	
-
+	addStateLayers();
 	messageLayer = new Kinetic.Layer();
-	for(i in STATES){
-		STATES[i].INIT();
-		stage.add(STATES[i].LAYER);
-	}
 	stage.add(messageLayer);
 
 	document.addEventListener('mousedown', inputDown, false);
 	document.addEventListener('touchstart', inputDown, false);
 
 	setScreen();
+	setState(STATES.MENU.NAME, 0);
 }
 
-var clear;
+function addStateLayers(){
+	for(i in STATES){
+		STATES[i].INIT();
+		for(j in STATES[i].LAYERS){
+			stage.add(STATES[i].LAYERS[j]);
+		}
+	}
+}
 function inputDown(event){
 	event.preventDefault();
 	var object = OBJ ? OBJ : circle;
