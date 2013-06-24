@@ -21,7 +21,7 @@ var DeviceHandler = {
 		StageHandler.stage.setWidth(this.width());
 		StageHandler.stage.setHeight(this.height());
 		StageHandler.stage.setWidth(document.querySelector("body").clientWidth);
-		StageHandler.stage.setHeight(document.querySelector("body").clientHeight - 10);
+		StageHandler.stage.setHeight(document.querySelector("body").clientHeight);
 
 		if(typeof(WebSettings) != 'undefined'){ WebSettings.setBuiltInZoomControls(false); }
 		window.scrollTo(0, 1);
