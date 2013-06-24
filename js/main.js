@@ -7,6 +7,7 @@ window.onload = function(){
 	StateHandler.initStates();
 	DeviceHandler.setScreen();
 	//setState(STATES.MENU.NAME, 0);
+	APP.play();
 }
 
 window.onresize = function(){
