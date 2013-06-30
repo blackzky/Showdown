@@ -8,6 +8,8 @@ var StageHandler = {
 
 		document.addEventListener('mousedown', DeviceHandler.inputDown, false);
 		document.addEventListener('touchstart', DeviceHandler.inputDown, false);
+		document.addEventListener('mouseup', DeviceHandler.inputUp, false);
+		document.addEventListener('mousemove', DeviceHandler.inputMove, false);
 	},
 	stage : null
 }

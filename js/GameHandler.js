@@ -28,13 +28,10 @@ APP.play = function() {
 	APP.core.frame();
 };
  
-var count = 0;
-var z = 0;
 APP.core = {
 	frame: function() {
 		APP.core.setDelta();
 		APP.core.update();
-		APP.core.render();
 		APP.core.animationFrame = window.requestAnimFrame(APP.core.frame);
 	},
  
@@ -43,16 +40,6 @@ APP.core = {
 		APP.core.delta = (APP.core.now - APP.core.then) / 1000; // seconds since last frame
 		APP.core.then = APP.core.now;
 	},
- 
-	update: function() {
-		count += APP.core.delta;
-		if(count >= 1){
-		console.log(z);
-		count = 0;
-		z++;
-		}
-	},
- 
-	render: function() {}
+	update: function(){}
 };
  
