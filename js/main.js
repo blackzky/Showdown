@@ -6,7 +6,7 @@ window.onload = function(){
 	StageHandler.initStage();
 	StateHandler.initStates();
 	DeviceHandler.setScreen();
-	//setState(STATES.MENU.NAME, 0);
+	StateHandler.setState(StateHandler.States.MENU.NAME, 0);
 	APP.play();
 }
 

@@ -43,3 +43,7 @@ APP.core = {
 	update: function(){}
 };
  
+
+APP.gameobjects = {};
+
+APP.activeobjects = {};

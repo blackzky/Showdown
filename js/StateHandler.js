@@ -1,16 +1,8 @@
 var StateHandler = {
 	currentState : null,
-	States : {},
 	messageLayer : null,
-	writeMessage : function(message) {
-		var context = this.messageLayer.getContext();
-		this.messageLayer.clear();
-		context.font = '18pt Calibri';
-		context.fillStyle = 'black';
-		context.fillText(message, 10, 25);
-	},
-	initStates : function(){
-		this.States.MENU = {
+	States : {
+		MENU: {
 			name : "MENU",
 			layers : {
 				hud : null
@@ -18,7 +10,7 @@ var StateHandler = {
 			init : function(){
 				this.layers.hud = new Kinetic.Layer();
 				var playButton = new Kinetic.Label({
-					x: (StageHandler.stage.getWidth() / 2),
+					x: (StageHandler.stage.getWidth() / 2) - 10,
 					y: (StageHandler.stage.getHeight() / 2),
 					opacity: 0.75
 				});
@@ -37,8 +29,8 @@ var StateHandler = {
 				});
 				this.layers.hud.add(playButton);
 			}
-		};
-		this.States.INGAME = {
+		},
+		INGAME: {
 			name : "INGAME",	
 			layers : {
 				field : null
@@ -153,27 +145,96 @@ var StateHandler = {
 				  stroke: 'black',
 				});
 				this.layers.field.add(pierceIco);
+			},
+			addStartCursor: function(x, y){
+				var cursor = { x: x, y: y };
+				var layer = new Kinetic.Layer({id: "start_cursor"});
 
-
-				var circle = new Kinetic.Circle({
-					//x: (StageHandler.stage.getWidth() / 3),
-					//y: (StageHandler.stage.getHeight() / 2),
-					x: 70,
-					y: 70,
-					radius: 70,
-					fill: 'red',
-					stroke: 'black',
-					strokeWidth: 4
-				}).on('mousedown touchstart', function(e) {
-					StateHandler.writeMessage("Circle: mousedown or touchstart");
-				}).on('mouseup touchend', function(e) {
-					StateHandler.writeMessage("Circle: mouseup or touchsend");
-					StateHandler.setState(StateHandler.States.MENU.name);
+				var centerCircle = new Kinetic.Circle({
+				  x: cursor.x,
+				  y: cursor.y,
+				  fill: 'black',
+				  radius: 4,
 				});
-				//this.layers.field.add(circle);
-			}
-		};
+				
+				var outerCircle = new Kinetic.Circle({
+				  x: cursor.x,
+				  y: cursor.y,
+				  radius: 8,
+				  strokeWidth: 2
+				});
 
+				layer.add(centerCircle);
+				layer.add(outerCircle);
+
+				StageHandler.stage.add(layer);
+
+			},
+			addMoveCursor: function(x, y){
+				var cursor = { x: x, y: y };
+				var layer = StageHandler.stage.get("#end_cursor")[0];
+				if(isDefined(layer)){
+					var children = StageHandler.stage.get("#end_cursor")[0].children;
+					if(isDefined(children[0])){
+						for(var i in children){
+							if(isDefined(children[i]) && isDefined(children[i].nodeType)){
+								if(children[i].className == "Line"){
+									children[i].destroy();
+								}else{
+									children[i].setX(cursor.x);
+									children[i].setY(cursor.y);
+								}
+							}
+						}
+						var s_children = StageHandler.stage.get("#start_cursor")[0].children;
+						var line = new Kinetic.Line({
+							points: [s_children[0].getX(), s_children[0].getY(), cursor.x, cursor.y],
+							stroke: 'black',
+							strokeWidth: 2,
+						});
+						layer.add(line);
+						layer.draw();
+					}
+				}else{
+					layer = new Kinetic.Layer({id: "end_cursor"});
+					var innerCircle = new Kinetic.Circle({
+					  x: cursor.x,
+					  y: cursor.y,
+					  radius: 4,
+					  fill: 'black'
+					});
+					var outerCircle = new Kinetic.Circle({
+					  x: cursor.x,
+					  y: cursor.y,
+					  radius: 16,
+					  stroke: 'black',
+					  strokeWidth: 2
+					});
+					layer.add(innerCircle);
+					layer.add(outerCircle);
+					StageHandler.stage.add(layer);
+				}
+			},
+			handleInputDown: function(params){
+				StateHandler.States.INGAME.addStartCursor(params.x, params.y);
+			},
+			handleInputMove: function(params){
+				StateHandler.States.INGAME.addMoveCursor(params.x, params.y);
+			},
+			handleInputEnd: function(params){
+				StageHandler.stage.get("#start_cursor").destroy();
+				StageHandler.stage.get("#end_cursor").destroy();
+			},
+		}
+	},
+	writeMessage : function(message) {
+		var context = this.messageLayer.getContext();
+		this.messageLayer.clear();
+		context.font = '18pt Calibri';
+		context.fillStyle = 'black';
+		context.fillText(message, 10, 25);
+	},
+	initStates : function(){
 		this.addStateLayers();
 		this.messageLayer = new Kinetic.Layer();
 		StageHandler.stage.add(this.messageLayer);
@@ -191,7 +252,6 @@ var StateHandler = {
 				StateHandler.currrentState = state;
 				for(j in StateHandler.States[i].layers){
 					if(StateHandler.States[i].name == StateHandler.currentState){
-						console.log(i + " " + j);
 						StateHandler.States[i].layers[j].show();
 					}else{
 						StateHandler.States[i].layers[j].hide();
