@@ -9,9 +9,6 @@ var StateHandler = {
 			},
 			init : function(){
 				this.layers.hud = new Kinetic.Layer();
-				var GameAssets = new Image();
-				GameAssets.src = 'img/GameAssets.png';
-
 				var animations = {
 					idle: [{
 						x: 0,
@@ -27,17 +24,17 @@ var StateHandler = {
 					}]
 				};
 
-				GameAssets.onload= function(){
 					var blob = new Kinetic.Sprite({
+						id: "blob",
 						x: StageHandler.stage.getWidth()/2 - 32,
 						y: StageHandler.stage.getHeight()/2 - 32,
-						image: GameAssets,
+						image: Resources.GameAssets,
 						animation: 'idle',
 						animations: animations,
 						frameRate: 0,
 						index: 0,
-						offset: [this.x + 32, this.y + 32],
-						rotationDeg: 90
+						offset: [32, 32],
+						rotationDeg: 90 
 					});
 
 					blob.on('mousedown', function() {
@@ -49,7 +46,6 @@ var StateHandler = {
 					});
 					StateHandler.States.MENU.layers.hud.add(blob);
 					blob.start();
-				};
 			}
 		},
 		INGAME: {
