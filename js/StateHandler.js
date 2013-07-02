@@ -9,25 +9,47 @@ var StateHandler = {
 			},
 			init : function(){
 				this.layers.hud = new Kinetic.Layer();
-				var playButton = new Kinetic.Label({
-					x: (StageHandler.stage.getWidth() / 2) - 10,
-					y: (StageHandler.stage.getHeight() / 2),
-					opacity: 0.75
-				});
-				playButton.add(new Kinetic.Tag({
-				  fill: 'teal',
-					stroke: 'black'
-				})).add(new Kinetic.Text({
-				  text: 'Play',
-				  fontFamily: 'Arial',
-				  fontSize: 30,
-				  padding: 5,
-				  fill: 'black'
-				})).on('mouseup touchend', function(e) {
-					console.log("goto INGAME State");
-					StateHandler.setState(StateHandler.States.INGAME.name);
-				});
-				this.layers.hud.add(playButton);
+				var GameAssets = new Image();
+				GameAssets.src = 'img/GameAssets.png';
+
+				var animations = {
+					idle: [{
+						x: 0,
+						y: 128,
+						width: 64,
+						height: 64
+					}],
+					active: [{
+						x: 64,
+						y: 128,
+						width: 64,
+						height: 64 
+					}]
+				};
+
+				GameAssets.onload= function(){
+					var blob = new Kinetic.Sprite({
+						x: StageHandler.stage.getWidth()/2 - 32,
+						y: StageHandler.stage.getHeight()/2 - 32,
+						image: GameAssets,
+						animation: 'idle',
+						animations: animations,
+						frameRate: 0,
+						index: 0,
+						offset: [this.x + 32, this.y + 32],
+						rotationDeg: 90
+					});
+
+					blob.on('mousedown', function() {
+							StateHandler.setState(StateHandler.States.INGAME.name);
+					}).on('mouseover', function() {
+						blob.setAnimation('active');
+					}).on('mouseup mouseout', function() {
+						blob.setAnimation('idle');
+					});
+					StateHandler.States.MENU.layers.hud.add(blob);
+					blob.start();
+				};
 			}
 		},
 		INGAME: {
