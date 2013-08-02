@@ -1,3 +1,4 @@
+var m = false;
 window.onload = function(){
 	console.log("on load...");
 	Game.Sources = {

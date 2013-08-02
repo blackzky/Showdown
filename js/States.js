@@ -82,16 +82,28 @@ menu.init = function(){
               return pos;
           }
 
+      }).on("touchstart", function(e){
+      	e.cancelBubble = true;
+      	m = true;
       }).on("dragend", function(){
      		this.setX(dPadContainer.getX() + 64); 
      		this.setY(dPadContainer.getY() + 64); 
+     		m = false;
       }).on("dragmove", function(){
       	var b = Game.Stage.get("#blob")[0];
       	if(b){
-      		var dpc = {y:dPadContainer.getY()+64, x:dPadContainer.getX()+64};
+      		var dpc = { x: dPadContainer.getX() + 64, y: dPadContainer.getY() + 64 };
       		var angle = Math.atan((this.getY() - dpc.y)/(this.getX() - dpc.x));
       		angle = ((angle * 180)/Math.PI) + ((this.getX() - dpc.x)>0 ? 90 : -90);
       		b.setRotationDeg(angle);
+      		console.log(m);
+      		if(m){
+						var velocity = 300;
+						var dist = velocity * Game.delta;
+						var dx = ( dist * Math.sin(b.getRotationDeg() * (Math.PI / 180))  );
+						var dy = ( dist * Math.cos(b.getRotationDeg() * (Math.PI / 180)) );
+						b.move(dx, -dy);
+					}
       	}
       });
 
