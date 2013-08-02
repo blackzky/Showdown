@@ -2,7 +2,10 @@ window.onload = function(){
 	console.log("on load...");
 	Game.Sources = {
 		GameAssets: "img/GameAssets.png",
-		test: "img/test-asset.png"
+		test: "img/test-asset.png",
+		triangle: "img/triangle.png",
+		dPadContainer: "img/d-pad-container.png",
+		dPadCenter: "img/d-pad-center.png",
 	};
 	//Game.States = States;
 	Game.initEvents(function(){
@@ -14,16 +17,33 @@ window.onload = function(){
 			if(b){
 				var velocity = 300;
 				var dist = velocity * Game.delta;
-				if(e.which == 87){
-					b.move(0, dist);
-					if(b.getY() > Game.screenHeight()-b.getHeight()){
-						b.setY(0);
-					}
-					if(Game.time - last_update > 0.15){
-						b.setIndex((b.getIndex() + 1) % b.getAnimations().walk.length);	
-						last_update = Game.time;
-					}
+				if(e.which == 68){
+					b.setRotationDeg(b.getRotationDeg() + 10);
+				}else if(e.which == 65){
+					b.setRotationDeg(b.getRotationDeg() - 10);
 				}
+
+				var dx = ( dist * Math.sin(b.getRotationDeg() * (Math.PI / 180))  );
+				var dy = ( dist * Math.cos(b.getRotationDeg() * (Math.PI / 180)) );
+				if(e.which == 87){
+					b.move(dx, -dy);
+				}else if(e.which == 83){
+					b.move(dx, dy);
+				}
+
+
+				//b.setX(dx);
+				//b.setY(dy);
+				if(b.getY() > Game.screenHeight()-b.getHeight()){
+					b.setY(0);
+				}
+				if(Game.time - last_update > 0.15){
+					//if(b.getAnimations().walk.length > 1){
+						//b.setIndex((b.getIndex() + 1) % b.getAnimations().walk.length);	
+					//}
+					last_update = Game.time;
+				}
+
 			}
 		}, false);
 
