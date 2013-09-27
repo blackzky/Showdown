@@ -1,0 +1,49 @@
+Showdown v0.01
+
+
+Run these in inside the "window.onload" to initialize the Game:
+1. Add sources
+	Game.addSource("source_name", "folder/source_name.png");
+
+2. Add states
+	Game.addState("State_name", state);
+
+3. Set events (mouse, touch, keyboard)
+	Game.initEvents(function(){
+
+	});
+
+4. Set update function
+	Game.setUpdate(function(){
+
+	});
+5. Start Game	
+	Game.start({container :"container"});
+
+
+To use MOUSETRAP: <https://github.com/ccampbell/mousetrap>
+
+Mousetrap.bind('4', function() { console.log('4'); });
+Mousetrap.bind("?", function() { console.log('show shortcuts!'); });
+Mousetrap.bind('esc', function() { console.log('escape'); }, 'keyup');
+
+// combinations
+Mousetrap.bind('command+shift+K', function() { console.log('command shift k'); });
+
+// map multiple combinations to the same callback
+Mousetrap.bind(['command+k', 'ctrl+k'], function() {
+	console.log('command k or control k');
+
+	// return false to prevent default browser behavior
+	// and stop event from bubbling
+	return false;
+});
+
+// gmail style sequences
+Mousetrap.bind('g i', function() { console.log('go to inbox'); });
+Mousetrap.bind('* a', function() { console.log('select all'); });
+
+// konami code!
+Mousetrap.bind('up up down down left right left right b a enter', function() {
+console.log('konami code');
+});

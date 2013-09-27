@@ -3,7 +3,25 @@ window.Game = window.Game || {};
 Game.Sources = {};
 Game.Sprites = {};
 Game.States = {};
+Game.update = function(){};
 Game.Stage = null;
+
+Game.addState = function(state_name, state){
+	if(!Game.States[state_name]){
+		Game.States[state_name] = state;
+	}
+}
+
+Game.addSource = function(source_name, source){
+	if(!Game.Sources[source_name]){
+		Game.Sources[source_name] = source;
+	}	
+}
+
+Game.setUpdate = function(update){
+	Game.update = update;
+}
+
 
 Game.start = function(params){
 	Game.Stage = new Kinetic.Stage({
@@ -14,8 +32,8 @@ Game.start = function(params){
 	Game.setScreen();
 	Game.loadImages(Game.Sources, Game.init);
 }
-Game.initEvents = function(custom){
-	custom();
+Game.initEvents = function(gameEvents){
+	gameEvents();
 }
 Game.play = function() {
 	Game.core.then = Date.now();
@@ -51,6 +69,7 @@ Game.loadImages = function(sources, callback) {
 		Game.Sprites[src].src = sources[src];
 	}
 } 
+
 Game.core = {
 	frame: function() {
 		Game.core.setDelta();
@@ -64,7 +83,9 @@ Game.core = {
 		Game.time = Game.time + Game.delta;
 		Game.core.then = Game.core.now;
 	},
-	update: function(){ }
+	update: function(){ 
+		Game.update();
+	}
 };
 
 Game.screenWidth = function(){
