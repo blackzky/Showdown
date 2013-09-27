@@ -1,5 +1,7 @@
 Showdown v0.01
 
+For multi touch event support:
+https://github.com/atomictag/Kinetic.MultiTouch
 
 Run these in inside the "window.onload" to initialize the Game:
 1. Add sources

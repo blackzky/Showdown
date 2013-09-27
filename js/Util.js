@@ -8,3 +8,13 @@ Util.isDefined = function(object, cb){
 		return false;
 	}
 };
+
+Util.pointInBox = function(point, box){
+	var px = point.x,
+		py = point.y,
+		bx = box.x,
+		by = box.y,
+		bw = box.w,
+		bh = box.h;
+	return (px > bx && px < bx+bw && py > by && py <by+bh);
+}

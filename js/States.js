@@ -128,8 +128,9 @@ menu.setInit(function(){
         center_image: Game.Sprites.dPadCenter
       });
 
-      this.layers.hud.add(controller.getContainer());
-      this.layers.hud.add(controller.getCenter());
+      controller.addToStage(this.layers.hud);
+      //this.layers.hud.add(controller.getContainer());
+      //this.layers.hud.add(controller.getCenter());
 
 			this.layers.hud.add(blob);
 			this.layers.hud.add(simpleText);
@@ -160,7 +161,6 @@ var GameController = function(id){
   this.getCenter = function(){ return center};
 
   this.initController = function(controller){
-      console.log("aw");
       container = new Kinetic.Image({
           x: controller.cont_x, 
           y: controller.cont_y,
@@ -193,16 +193,43 @@ var GameController = function(id){
               return pos;
           }
 
-      }).on("touchstart", function(e){
-        e.cancelBubble = true;
-        console.log("touch start");
       }).on("dragend", function(){
-        //this.setX(container.getX() + controller.center_size); 
-        //this.setY(container.getY() + controller.center_size); 
-        console.log("end D");
-      }).on("dragmove", function(){
-        console.log("move D");
+        this.setX(container.getX() + controller.center_size); 
+        this.setY(container.getY() + controller.center_size); 
+        this.getLayer().draw();
+      }).on("dragmove", function(e){
+        var c = Game.Stage.get("#character")[0];
+        var p = {x: this.getX(), y: this.getY()};
+        var box = {
+          x: container.getX(), 
+          y: container.getY(), 
+          w: container.getWidth(), 
+          h: container.getHeight() 
+        };
+
+        box.w = (box.w/3);
+        box.h = (box.h/3);
+
+        if(Util.pointInBox(p, box)) {
+          c.setRotationDeg(315);
+        }
+        box.x = box.w;
+        box.w = ((container.getWidth()*2)/3);
+        if(Util.pointInBox(p, box)){
+          c.setRotationDeg(0);
+        }
+        box.x = box.w;
+        box.w = container.getWidth();
+        if(Util.pointInBox(p, box)){
+          c.setRotationDeg(45);
+        }
+        //console.log("move [" + this.getX() + ", " + this.getY() + "]");
       });
+  }
+
+  this.addToStage = function(layer){
+    layer.add(container);
+    layer.add(center);
   }
 
 };
