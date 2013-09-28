@@ -120,8 +120,8 @@ menu.setInit(function(){
 
       var controller = new GameController("player");
       controller.initController({
-        cont_x: 0,
-        cont_y: 0,
+        cont_x: 32,
+        cont_y: 32,
         cont_size: 128,
         cont_image: Game.Sprites.dPadContainer,
         center_size: 64,
@@ -157,6 +157,9 @@ var GameController = function(id){
   var container = null;
   var center = null;
 
+  var t_cont = null;
+  var t_cent = null;
+
   this.getContainer = function(){ return container};
   this.getCenter = function(){ return center};
 
@@ -165,10 +168,51 @@ var GameController = function(id){
           x: controller.cont_x, 
           y: controller.cont_y,
           width: controller.cont_size, 
-          height: controller.cont_x,
+          height: controller.cont_size,
           image: controller.cont_image,
           name: "container"
       });
+
+      t_cont = new Kinetic.Rect({
+        x: controller.cont_x + controller.cont_size + 100,
+        y: controller.cont_y + controller.cont_size + 100,
+        width: controller.cont_size,
+        height: controller.cont_size,
+        fill: "black",
+      });
+
+      t_cent = new Kinetic.Rect({
+        x: t_cont.getX() + controller.cont_size/2,
+        y: t_cont.getY() + controller.cont_size/2,
+        width: 2, 
+        height: 2,
+        fill: "red",
+      });
+
+
+        //
+        var box = {x: t_cont.getX(), y: t_cont.getY(), w: 0, h: 0 };
+        var box3rd = container.getWidth()/3;
+
+        box.w = box3rd;
+        box.h = box3rd;
+        window.b1 = t_cont.clone();
+        b1.setX(t_cont.getX());
+        b1.setY(t_cont.getX());
+        b1.setWidth(box3rd);
+        b1.setHeight(box3rd);
+        b1.setFill("green");
+
+        window.b2 = b1.clone();
+        b2.setX(t_cont.getX() + box3rd);
+        b2.setY(t_cont.getX());
+        b2.setFill("blue");
+        window.b3 = b2.clone();
+        b3.setX(t_cont.getX());
+        b3.setY(t_cont.getX() + box3rd);
+        b3.setFill("yellow");
+
+        // 
 
       center = new Kinetic.Image({
           x: container.getX() + controller.center_size,
@@ -182,7 +226,7 @@ var GameController = function(id){
           dragBoundFunc: function(pos) {
             var x = container.getX() + controller.center_size;
             var y = container.getY() + controller.center_size;
-            var radius = controller.center_size/2;
+            var radius = controller.center_size/2 + controller.center_size/6;
             var scale = radius / Math.sqrt(Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2));
             if(scale < 1)
               return {
@@ -210,26 +254,82 @@ var GameController = function(id){
         box.w = (box.w/3);
         box.h = (box.h/3);
 
-        if(Util.pointInBox(p, box)) {
+        var dir = getDirection(p);
+
+        if(dir == "NORTH-WEST") {
           c.setRotationDeg(315);
-        }
-        box.x = box.w;
-        box.w = ((container.getWidth()*2)/3);
-        if(Util.pointInBox(p, box)){
+        }else if(dir == "NORTH") {
           c.setRotationDeg(0);
-        }
-        box.x = box.w;
-        box.w = container.getWidth();
-        if(Util.pointInBox(p, box)){
+        }else if(dir == "NORTH-EAST") {
           c.setRotationDeg(45);
+        }else if(dir == "EAST") {
+          c.setRotationDeg(90);
+        }else if(dir == "SOUTH-EAST") {
+          c.setRotationDeg(135);
+        }else if(dir == "SOUTH") {
+          c.setRotationDeg(180);
+        }else if(dir == "SOUTH-WEST") {
+          c.setRotationDeg(225);
+        }else if(dir == "WEST") {
+          c.setRotationDeg(270);
         }
+
         //console.log("move [" + this.getX() + ", " + this.getY() + "]");
       });
+
+    var getDirection =function(p){
+
+
+        t_cent.setX(t_cont.getX() + (p.x - container.getX()));
+        t_cent.setY(t_cont.getY() + (p.y - container.getY()));
+
+        var box = {x: container.getX(), y: container.getY(), w: 0, h: 0 };
+        var box3rd = container.getWidth()/3;
+
+        box.w = box3rd;
+        box.h = box3rd;
+        if(Util.pointInBox(p, box)){return "NORTH-WEST"; }
+
+        box.w += box3rd;
+        if(Util.pointInBox(p, box)){return "NORTH"; }
+
+        box.w += box3rd;
+        if(Util.pointInBox(p, box)){return "NORTH-EAST"; }
+
+        box.w = box3rd;
+        box.h += box3rd;
+        if(Util.pointInBox(p, box)){return "WEST"; }
+
+        box.w += box3rd;
+        if(Util.pointInBox(p, box)){return "CENTER"; }
+
+        box.w += box3rd;
+        if(Util.pointInBox(p, box)){return "EAST"; }
+
+        box.w = box3rd;
+        box.h += box3rd;
+        if(Util.pointInBox(p, box)){return "SOUTH-WEST"; }
+
+        box.w += box3rd;
+        if(Util.pointInBox(p, box)){return "SOUTH"; }
+
+        box.w += box3rd;
+        if(Util.pointInBox(p, box)){return "SOUTH-EAST"; }
+    }
   }
 
   this.addToStage = function(layer){
     layer.add(container);
     layer.add(center);
+
+    layer.add(t_cont);
+    layer.add(t_cent);
+    layer.add(window.b1);
+    layer.add(window.b2);
+    layer.add(window.b3);
+        b1.setZIndex(3);
+        b2.setZIndex(3);
+        b3.setZIndex(3);
   }
 
 };
