@@ -14,7 +14,7 @@ var menu = new State("Menu");
 menu.setInit(function(){
   menu.addLayer("hud", new Kinetic.Layer());
   var simpleText = new Kinetic.Text({
-    x: Game.screenWidth() / 2,
+    x: (Game.screenWidth() / 2),
     y: 15,
     text: 'Simple Text',
     fontSize: 30,
@@ -52,7 +52,16 @@ menu.setInit(function(){
           animations: animations,
           frameRate: 7,
           index: 0,
+          multitouch: true,
           id: "character"
+      }).on(Kinetic.MultiTouch.TOUCHSTART,function(){
+     		var t = Game.Stage.get("#text")[0]; 
+     		t.setText("Character touched!");
+        t.getLayer().draw();
+      }).on(Kinetic.MultiTouch.TOUCHEND,function(){
+     		var t = Game.Stage.get("#text")[0]; 
+     		t.setText("Character NOT touched!");
+        t.getLayer().draw();
       });
 
       /*
@@ -144,21 +153,23 @@ menu.setInit(function(){
 
 
 var DIRECTION = {
-  CENTER: 0,
-  NORTH: 1
+  CENTER: "CENTER",
+  NORTH: "NORTH",
+  NORTHEAST: "NORTH EAST",
+  EAST: "EAST",
+  SOUTHEAST: "SOUTH EAST",
+  SOUTH: "SOUTH",
+  SOUTHWEST: "SOUTH WEST",
+  WEST: "WEST",
+  NORTHWEST:"NORTH WEST" 
 };
 
 var GameController = function(id){
   this.id = id;
   this.direction = DIRECTION.CENTER;
-  var CENTER_DRAGGED = false;
-  var CENTER_DRAG_END = true;
 
   var container = null;
   var center = null;
-
-  var t_cont = null;
-  var t_cent = null;
 
   this.getContainer = function(){ return container};
   this.getCenter = function(){ return center};
@@ -173,47 +184,6 @@ var GameController = function(id){
           name: "container"
       });
 
-      t_cont = new Kinetic.Rect({
-        x: controller.cont_x + controller.cont_size + 100,
-        y: controller.cont_y + controller.cont_size + 100,
-        width: controller.cont_size,
-        height: controller.cont_size,
-        fill: "black",
-      });
-
-      t_cent = new Kinetic.Rect({
-        x: t_cont.getX() + controller.cont_size/2,
-        y: t_cont.getY() + controller.cont_size/2,
-        width: 2, 
-        height: 2,
-        fill: "red",
-      });
-
-
-        //
-        var box = {x: t_cont.getX(), y: t_cont.getY(), w: 0, h: 0 };
-        var box3rd = container.getWidth()/3;
-
-        box.w = box3rd;
-        box.h = box3rd;
-        window.b1 = t_cont.clone();
-        b1.setX(t_cont.getX());
-        b1.setY(t_cont.getX());
-        b1.setWidth(box3rd);
-        b1.setHeight(box3rd);
-        b1.setFill("green");
-
-        window.b2 = b1.clone();
-        b2.setX(t_cont.getX() + box3rd);
-        b2.setY(t_cont.getX());
-        b2.setFill("blue");
-        window.b3 = b2.clone();
-        b3.setX(t_cont.getX());
-        b3.setY(t_cont.getX() + box3rd);
-        b3.setFill("yellow");
-
-        // 
-
       center = new Kinetic.Image({
           x: container.getX() + controller.center_size,
           y: container.getY() + controller.center_size,
@@ -221,115 +191,112 @@ var GameController = function(id){
           width: controller.center_size, 
           height: controller.center_size,
           image: controller.center_image,
-          name: "center",
-          draggable: true,
+          id: "game-controller",
+          multitouch: {draggable: true},
           dragBoundFunc: function(pos) {
             var x = container.getX() + controller.center_size;
             var y = container.getY() + controller.center_size;
             var radius = controller.center_size/2 + controller.center_size/6;
             var scale = radius / Math.sqrt(Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2));
             if(scale < 1)
-              return {
-                y: Math.round((pos.y - y) * scale + y),
-                x: Math.round((pos.x - x) * scale + x)
-              };
+              return { y: Math.round((pos.y - y) * scale + y), x: Math.round((pos.x - x) * scale + x) };
             else
               return pos;
           }
 
-      }).on("dragend", function(){
+      }).on(Kinetic.MultiTouch.TAP, function(){
+      	use_delta = !use_delta;
+      	console.log(use_delta);
+      }).on(Kinetic.MultiTouch.TOUCHSTART, function(){
+      	move_char_t = true;
+      }).on(Kinetic.MultiTouch.DRAGEND, function(){
         this.setX(container.getX() + controller.center_size); 
         this.setY(container.getY() + controller.center_size); 
         this.getLayer().draw();
-      }).on("dragmove", function(e){
+      	move_char_t = false;
+      }).on(Kinetic.MultiTouch.DRAGMOVE, function(e){
         var c = Game.Stage.get("#character")[0];
         var p = {x: this.getX(), y: this.getY()};
-        var box = {
-          x: container.getX(), 
-          y: container.getY(), 
-          w: container.getWidth(), 
-          h: container.getHeight() 
-        };
-
-        box.w = (box.w/3);
-        box.h = (box.h/3);
 
         var dir = getDirection(p);
 
-        if(dir == "NORTH-WEST") {
+        if(dir == DIRECTION.NORTHWEST) {
           c.setRotationDeg(315);
-        }else if(dir == "NORTH") {
+        }else if(dir == DIRECTION.NORTH) {
           c.setRotationDeg(0);
-        }else if(dir == "NORTH-EAST") {
+        }else if(dir == DIRECTION.NORTHEAST) {
           c.setRotationDeg(45);
-        }else if(dir == "EAST") {
+        }else if(dir == DIRECTION.EAST) {
           c.setRotationDeg(90);
-        }else if(dir == "SOUTH-EAST") {
+        }else if(dir == DIRECTION.SOUTHEAST) {
           c.setRotationDeg(135);
-        }else if(dir == "SOUTH") {
+        }else if(dir == DIRECTION.SOUTH) {
           c.setRotationDeg(180);
-        }else if(dir == "SOUTH-WEST") {
+        }else if(dir == DIRECTION.SOUTHWEST) {
           c.setRotationDeg(225);
-        }else if(dir == "WEST") {
+        }else if(dir == DIRECTION.WEST) {
           c.setRotationDeg(270);
         }
 
-        //console.log("move [" + this.getX() + ", " + this.getY() + "]");
+     		var t = Game.Stage.get("#text")[0]; 
+     		t.setText("(Delta: " + use_delta + ") [" + c.getRotationDeg() + "] " + dir);
+        t.getLayer().draw();
+
       });
 
+	
+		var move = function(){
+        var character = Game.Stage.get("#character")[0];
+        var deg = character.getRotation();
+
+				var speed = 64;
+				var delta = Game.delta;
+        var vx = character.getX() + (delta * speed * Math.sin(deg));
+        var vy = character.getY() - (delta * speed * Math.cos(deg));
+			
+				character.setPosition([vx, vy]);
+
+		}
+
     var getDirection =function(p){
-
-
-        t_cent.setX(t_cont.getX() + (p.x - container.getX()));
-        t_cent.setY(t_cont.getY() + (p.y - container.getY()));
-
         var box = {x: container.getX(), y: container.getY(), w: 0, h: 0 };
         var box3rd = container.getWidth()/3;
 
         box.w = box3rd;
         box.h = box3rd;
-        if(Util.pointInBox(p, box)){return "NORTH-WEST"; }
+        if(Util.pointInBox(p, box)){return DIRECTION.NORTHWEST; }
 
         box.w += box3rd;
-        if(Util.pointInBox(p, box)){return "NORTH"; }
+        if(Util.pointInBox(p, box)){return DIRECTION.NORTH; }
 
         box.w += box3rd;
-        if(Util.pointInBox(p, box)){return "NORTH-EAST"; }
+        if(Util.pointInBox(p, box)){return DIRECTION.NORTHEAST; }
 
         box.w = box3rd;
         box.h += box3rd;
-        if(Util.pointInBox(p, box)){return "WEST"; }
+        if(Util.pointInBox(p, box)){return DIRECTION.WEST; }
 
         box.w += box3rd;
-        if(Util.pointInBox(p, box)){return "CENTER"; }
+        if(Util.pointInBox(p, box)){return DIRECTION.CENTER; }
 
         box.w += box3rd;
-        if(Util.pointInBox(p, box)){return "EAST"; }
+        if(Util.pointInBox(p, box)){return DIRECTION.EAST; }
 
         box.w = box3rd;
         box.h += box3rd;
-        if(Util.pointInBox(p, box)){return "SOUTH-WEST"; }
+        if(Util.pointInBox(p, box)){return DIRECTION.SOUTHWEST; }
 
         box.w += box3rd;
-        if(Util.pointInBox(p, box)){return "SOUTH"; }
+        if(Util.pointInBox(p, box)){return DIRECTION.SOUTH; }
 
         box.w += box3rd;
-        if(Util.pointInBox(p, box)){return "SOUTH-EAST"; }
+        if(Util.pointInBox(p, box)){return DIRECTION.SOUTHEAST; }
     }
   }
 
   this.addToStage = function(layer){
     layer.add(container);
     layer.add(center);
-
-    layer.add(t_cont);
-    layer.add(t_cent);
-    layer.add(window.b1);
-    layer.add(window.b2);
-    layer.add(window.b3);
-        b1.setZIndex(3);
-        b2.setZIndex(3);
-        b3.setZIndex(3);
   }
 
 };

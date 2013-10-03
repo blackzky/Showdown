@@ -24,7 +24,7 @@ Game.setUpdate = function(update){
 
 
 Game.start = function(params){
-	Game.Stage = new Kinetic.Stage({
+	Game.Stage = new Kinetic.MultiTouch.Stage({
 		container: params.container,
 		width: Game.screenWidth(),
 		height: Game.screenHeight()
