@@ -50,6 +50,16 @@ var Character = function(config){
 			direction = gameController.getDirection();
 			rotateSprite(direction);
 
+			var b = gameController.buttonTapped(BUTTON.BOX);
+			if(b) {console.log("box: " + b);}
+			var x = gameController.buttonTapped(BUTTON.X);
+			if(x) {console.log("x: " + x);}
+			var c = gameController.buttonTapped(BUTTON.CIRCLE);
+			if(c) {console.log("c: " + c);}
+			var t = gameController.buttonTapped(BUTTON.TRIANGLE);
+			if(t) {console.log("t: " + t);}
+ 
+
 			if(gameController.isUsed()){
 				var deg = sprite.getRotation();
 
@@ -72,29 +82,14 @@ var Character = function(config){
 
 	var rotateSprite = function(direction){
 		switch(direction){
-			case DIRECTION.NORTHWEST:
-				sprite.setRotationDeg(315);
-				break;
-			case DIRECTION.NORTH:
-				sprite.setRotationDeg(0);
-				break;
-			case DIRECTION.NORTHEAST:
-				sprite.setRotationDeg(45);
-			case DIRECTION.EAST:
-				sprite.setRotationDeg(90);
-				break;
-			case DIRECTION.SOUTHEAST:
-				sprite.setRotationDeg(135);
-				break;
-			case DIRECTION.SOUTH:
-				sprite.setRotationDeg(180);
-				break;
-			case DIRECTION.SOUTHWEST:
-				sprite.setRotationDeg(225);
-				break;
-			case DIRECTION.WEST:
-				sprite.setRotationDeg(270);
-				break;
+			case DIRECTION.NORTHWEST: sprite.setRotationDeg(315); break;
+			case DIRECTION.NORTH: sprite.setRotationDeg(0); break;
+			case DIRECTION.NORTHEAST: sprite.setRotationDeg(45); break;
+			case DIRECTION.EAST: sprite.setRotationDeg(90); break;
+			case DIRECTION.SOUTHEAST: sprite.setRotationDeg(135); break;
+			case DIRECTION.SOUTH: sprite.setRotationDeg(180); break;
+			case DIRECTION.SOUTHWEST: sprite.setRotationDeg(225); break;
+			case DIRECTION.WEST: sprite.setRotationDeg(270); break;
 		}
 	};
 

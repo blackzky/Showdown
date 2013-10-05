@@ -17,13 +17,19 @@ menu.setInit(function(){
 	var controllerOne = new GameController({
 		id: "controllerOne",
 		position: [32, 32],
-		layer: this.layers.hud
+		layer: this.layers.hud,
+		btnPosition: [96, Game.screenHeight() - 96],
+		//btnRotation: 45 
+		btnRotation: 90 
 	});
 
 	var controllerTwo = new GameController({
 		id: "controllerTwo",
 		position: [Game.screenWidth() - 160, Game.screenHeight() - 160],
-		layer: this.layers.hud
+		layer: this.layers.hud,
+		btnPosition: [Game.screenWidth() - 96, 96],
+		//btnRotation: 225
+		btnRotation: 270
 	});
 
 	var cw = 64, ch = 64;

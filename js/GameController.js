@@ -11,9 +11,17 @@ var DIRECTION = {
   NORTHWEST:"NORTH WEST" 
 };
 
+
+var BUTTON = {
+	BOX: "BOX",
+	CIRCLE: "CIRCLE",
+	TRIANGLE: "TRIANGLE",
+	X: "X"
+};
+
 var GameController = function(config){
   var id = config.id || "controller";
-	var position = [(config.position[0] || 32), (config.position[1] || 32)];
+	var position = [config.position[0], config.position[1]];
 	var containerSize = config.containerSize || 128;
 	var centerSize = config.centerSize || 64;
 	var containerImage = config.containerImage || Game.Sprites.dPadContainer;
@@ -23,6 +31,18 @@ var GameController = function(config){
 	var opacityCenter = config.opacityCenter || 1;
   var direction = config.direction || DIRECTION.CENTER;
   var used = false;
+
+  /* Action Buttons */
+  var btnPosition = config.btnPosition;
+  var boxImage = config.boxImage || Game.Sprites.box; 
+  var circleImage = config.circleImage || Game.Sprites.circle; 
+  var xImage = config.xImage || Game.Sprites.x; 
+  var triangleImage = config.triangleImage || Game.Sprites.triangle; 
+  var buttonSize = config.buttonSize || 64;
+  var opacityBtns = config.opacityBtns || 1;
+  var btnRotation = config.btnRotation || 0;
+
+  var boxTapped = false, circleTapped = false, xTapped = false, triangleTapped = false;
 
 	var container = new Kinetic.Image({
 		x: position[0], 
@@ -68,8 +88,94 @@ var GameController = function(config){
 		direction = getCenterDirection(p);
 	});
 
+	var boxBtn = new Kinetic.Image({
+		//x: 0 + buttonSize/2 - 8, //y: 0 + buttonSize/2 - 8, //offset: [buttonSize/2, buttonSize/2], //rotationDeg: 45
+		position: [0, 0],
+		width: buttonSize, 
+		height: buttonSize,
+		image: boxImage,
+		opacity: opacityBtns,
+		name: "box-button",
+	}).on(Kinetic.MultiTouch.TOUCHSTART, function(){
+		boxTapped = true;
+	}).on(Kinetic.MultiTouch.TOUCHEND, function(){
+		boxTapped = false;
+	});
+
+	var xBtn = new Kinetic.Image({
+		//x: 64 + buttonSize/2 + 8, //y: 64 + buttonSize/2 + 8, //offset: [buttonSize/2, buttonSize/2], //rotationDeg: 45
+		position: [64, 64],
+		width: buttonSize, 
+		height: buttonSize,
+		image: xImage,
+		opacity: opacityBtns,
+		name: "x-button",
+	}).on(Kinetic.MultiTouch.TOUCHSTART, function(){
+		xTapped = true;
+	}).on(Kinetic.MultiTouch.TOUCHEND, function(){
+		xTapped = false;
+	});
+
+	var circleBtn = new Kinetic.Image({
+		//x: 0 - 8, //y: 64 + 8,
+		position: [0, 64],
+		width: buttonSize, 
+		height: buttonSize,
+		image: circleImage,
+		opacity: opacityBtns,
+		name: "circle-button",
+	}).on(Kinetic.MultiTouch.TOUCHSTART, function(){
+		circleTapped = true;
+	}).on(Kinetic.MultiTouch.TOUCHEND, function(){
+		circleTapped = false;
+	});
+
+	var triangleBtn = new Kinetic.Image({
+		//x: 64 + buttonSize/2 + 16, //y: 0 + buttonSize/2 - 16, //offset: [buttonSize/2, buttonSize/2], //rotationDeg: 45
+		position: [64, 0],
+		width: buttonSize, 
+		height: buttonSize,
+		image: triangleImage,
+		opacity: opacityBtns,
+		name: "triangle-button",
+	}).on(Kinetic.MultiTouch.TOUCHSTART, function(){
+		triangleTapped = true;
+	}).on(Kinetic.MultiTouch.TOUCHEND, function(){
+		triangleTapped = false;
+	});
+
+	this.buttonTapped = function(btn){
+		switch(btn){
+			case BUTTON.BOX:
+				return boxTapped;
+			case BUTTON.CIRCLE:
+				return circleTapped;
+			case BUTTON.TRIANGLE:
+				return triangleTapped;
+			case BUTTON.X:
+				return xTapped;
+			default:
+				return false;
+		}
+	}
+
+	var actionBtns = new Kinetic.Group({
+		position: btnPosition,
+		offset: [buttonSize, buttonSize],
+		listening: true,
+		multitouch: true,
+		rotationDeg: btnRotation 
+	});
+
 	layer.add(container);
 	layer.add(center);
+
+	actionBtns.add(boxBtn);
+	actionBtns.add(xBtn);
+	actionBtns.add(circleBtn);
+	actionBtns.add(triangleBtn);
+
+	layer.add(actionBtns);
 
 	container.setZIndex(100);
 	center.setZIndex(101);
