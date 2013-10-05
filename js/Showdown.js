@@ -9,30 +9,10 @@ window.onload = function(){
 
 	handleEvents();
 
-	var character;
 	Game.setUpdate(function(){
-			if(move_char_t){
-				character = character || Game.Stage.get("#character")[0];
-				var deg = character.getRotation();
-
-				var speed = use_delta ? 96 : 2;
-				var delta = use_delta ? Game.delta : 1;
-				var vx = character.getX() + (delta * speed * Math.sin(deg));
-				var vy = character.getY() - (delta * speed * Math.cos(deg));
-				if(vx < 0){
-					vx = Game.screenWidth();
-				}else if(vx > Game.screenWidth()){
-					vx = 0;	
-				}
-				if(vy < 0){
-					vy = Game.screenHeight();
-				}else if(vy > Game.screenHeight()){
-					vy = 0;	
-				}
-
-				character.setPosition([vx, vy]);
-				character.getLayer().draw();
-			}
+		for(var i in Game.Entities){
+			Game.Entities[i].update();	
+		}
 	});
 
 	Game.start({container :"container"});

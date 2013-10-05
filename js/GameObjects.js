@@ -1,61 +1,3 @@
-var State = function(name){
-	this.name = name;
-	this.init = function(){};
-  this.setInit = function(_init){
-    this.init = _init;
-  }
-	this.layers = {};
-  this.addLayer = function(layer_name, layer){
-    this.layers[layer_name] = layer;
-  }
-}
-var menu = new State("Menu");
-menu.setInit(function(){
-
-  menu.addLayer("hud", new Kinetic.Layer());
-
-	var controllerOne = new GameController({
-		id: "controllerOne",
-		position: [32, 32],
-		layer: this.layers.hud
-	});
-
-	var cw = 64, ch = 64;
-	var animations = {
-		idle: [
-			{x: 0, y: 0, width: cw, height: ch }, 
-			{x: cw, y: 0, width: cw, height: ch }, 
-			{x: cw*2, y: 0, width: cw, height: ch }
-		],
-		walk: [
-			{x: 0, y: ch, width: cw, height: ch }, 
-			{x: cw, y: ch, width: cw, height: ch},
-			{x: cw*2, y: ch, width: cw, height: ch},
-			{x: cw*3, y: ch, width: cw, height: ch}
-		]
-	};
-
-	var characterOne = new Character({
-		position: [Game.screenWidth()/2 - cw/2, Game.screenHeight()/2 - ch/2],
-		offset: [cw/2, ch/2],
-		width: 64, height: 64,
-		image: Game.Sprites.character,
-		animation: 'idle',
-		animations: animations,
-		id: "character",
-		layer: this.layers.hud,
-		gameController: controllerOne
-	});
-
-	Game.addEntity(characterOne);
-
-
-	//this.layers.hud.add(simpleText);
-	//blob.setAnimation("walk"); 
-	//blob.start();
-});
-
-
 
 var Character = function(config){
 	var id = config.id || "character";
@@ -142,6 +84,4 @@ var Character = function(config){
 		}
 
 	};
-
 };
-

@@ -5,6 +5,11 @@ Game.Sprites = {};
 Game.States = {};
 Game.update = function(){};
 Game.Stage = null;
+Game.Entities = [];
+
+Game.addEntity = function(entity){
+	if(entity) (Game.Entities).push(entity);
+}
 
 Game.addState = function(state_name, state){
 	if(!Game.States[state_name]){
