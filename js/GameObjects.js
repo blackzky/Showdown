@@ -44,6 +44,7 @@ var Character = function(config){
 
 	this.Sprite = sprite;
 
+	var moveSpeed = 96;
 
 	this.update = function(){
 		if(gameController){
@@ -51,22 +52,28 @@ var Character = function(config){
 			rotateSprite(direction);
 
 			var b = gameController.buttonTapped(BUTTON.BOX);
-			if(b) {console.log("box: " + b);}
+			if(b) {
+			}
 			var x = gameController.buttonTapped(BUTTON.X);
-			if(x) {console.log("x: " + x);}
+			if(x) {
+			}
 			var c = gameController.buttonTapped(BUTTON.CIRCLE);
-			if(c) {console.log("c: " + c);}
+			if(c) {
+			}
 			var t = gameController.buttonTapped(BUTTON.TRIANGLE);
-			if(t) {console.log("t: " + t);}
+			if(t) {
+				moveSpeed = 768;
+			}else{
+				moveSpeed = 96;
+			}
  
 
 			if(gameController.isUsed()){
 				var deg = sprite.getRotation();
 
-				var speed = 96;
 				var delta = Game.delta;
-				var vx = sprite.getX() + (delta * speed * Math.sin(deg));
-				var vy = sprite.getY() - (delta * speed * Math.cos(deg));
+				var vx = sprite.getX() + (delta * moveSpeed * Math.sin(deg));
+				var vy = sprite.getY() - (delta * moveSpeed * Math.cos(deg));
 				if(vx < 0){ vx = Game.screenWidth(); }else if(vx > Game.screenWidth()){ vx = 0;	}
 				if(vy < 0){ vy = Game.screenHeight(); }else if(vy > Game.screenHeight()){ vy = 0;	}
 
