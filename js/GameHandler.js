@@ -40,6 +40,15 @@ Game.start = function(params){
 	Game.setScreen();
 	Game.loadImages(Game.Sources, Game.init);
 }
+Game.restart = function(){
+	Game.Stage = new Kinetic.MultiTouch.Stage({
+		container: Game.Stage.getContainer().id,
+		width: Game.screenWidth(),
+		height: Game.screenHeight()
+	});
+	Game.setScreen();
+	Game.loadImages(Game.Sources, Game.init);
+}
 Game.initEvents = function(gameEvents){
 	gameEvents();
 }

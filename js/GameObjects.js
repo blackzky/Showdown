@@ -72,13 +72,13 @@ var Projectile = function(config){
 			if(entity.entityType == "Mage"){
 				if(entity.getIdentifier() != mage.getIdentifier() && Util.collide(pBounds, entity.getBounds())){
 					destroyProjectile();
-					if(entity.curHP > 0){
-						entity.curHP = entity.curHP - mage.damage;
-						console.log(entity.Sprite.getId() + ": HP: "+ entity.curHP);
+					if(entity.getCurHP() > 0){
+						entity.setCurHP(entity.getCurHP() - mage.damage);
 					}
 					
-					if(enity.curHP <= 0){
-						console.log(entity.Sprite.getId() + " is dead");
+					if(entity.getCurHP() <= 0){
+						alert("Game Over! " + mage.getPlayerName() + " has won! Please restart the Game");
+						Game.pause();
 					}
 				}
 			}
@@ -129,24 +129,21 @@ var Mage = function(config){
 	var moveSpeed = 96;
 	var spriteRotation = config.rotationDeg;
 
-	this.getPlayerName = function(){
-		return player;
-	}
+	this.getPlayerName = function(){ return player; }
+
 	var attackCD = 500; //TEMP
 	var attackTimeStamp = -1; //TEMP
 
 	/* Mage stats */ //TEMP
 	this.damage = 2;
 	var maxHP = 10;
-	this.curHP = maxHP;
+	var curHP = maxHP;
+	this.setCurHP = function(hp){return curHP = hp;};
+	this.getCurHP = function(){return curHP;};
 
 	var identifier = 0;
-	this.setIndentifier = function(i){
-		identifier = i;
-	}
-	this.getIdentifier = function(){
-		return identifier;
-	}
+	this.setIndentifier = function(i){ identifier = i; }
+	this.getIdentifier = function(){ return identifier; }
 
 	this.getBounds = function(){
 		return (new Rectangle(sprite.getX() - sprite.getOffsetX(), sprite.getY() - sprite.getOffsetY(), config.width, config.height));
@@ -168,13 +165,23 @@ var Mage = function(config){
 	});
 	var playerName = new Kinetic.Text({
 		x: sprite.getX() - (player.length*7.5/2),
-		y: sprite.getY() + (sprite.getHeight()/2),
+		y: sprite.getY() + (sprite.getHeight()/2) + 2,
 		text: player,
 		fill: color 
 	});
 
+	//TEMP
+	var hpBar = new Kinetic.Rect({
+		x: sprite.getX() - sprite.getOffsetX()/2,
+		y: sprite.getY() + sprite.getHeight()/2,
+		width: sprite.getWidth()/2,
+		height: 2,
+		fill: "red"
+	});
+
 	layer.add(sprite);
 	layer.add(playerName);
+	layer.add(hpBar);
 
 	this.Sprite = sprite;
 
@@ -183,6 +190,7 @@ var Mage = function(config){
 			rotateSprite();
 			processAction(); 
 			moveMage();	
+			updateHPBar();
 
 			layer.draw();
 		}
@@ -241,7 +249,13 @@ var Mage = function(config){
 	};
 	var resetNamePosition = function(){
 		var x = sprite.getX() - (player.length*7.5/2);
-		var y = sprite.getY() + (sprite.getHeight()/2);
+		var y = sprite.getY() + (sprite.getHeight()/2) + 2;
 		playerName.setPosition([x, y]);	
 	}
+	var updateHPBar = function(){
+		var x = sprite.getX() - sprite.getOffsetX()/2;
+		var y = sprite.getY() + sprite.getHeight()/2;
+		hpBar.setWidth((curHP/maxHP) * (sprite.getWidth()/2));
+		hpBar.setPosition([x, y]);	
+	};
 };
