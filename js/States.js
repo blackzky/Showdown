@@ -47,7 +47,7 @@ menu.setInit(function(){
 		]
 	};
 
-	var characterOne = new Character({
+	var characterOne = new Mage({
 		position: [96, Game.screenHeight()/2 - ch/2],
 		offset: [cw/2, ch/2],
 		width: 64, height: 64,
@@ -63,7 +63,7 @@ menu.setInit(function(){
 		direction: DIRECTION.EAST
 	});
 
-	var characterTwo = new Character({
+	var characterTwo = new Mage({
 		position: [Game.screenWidth() - 96, Game.screenHeight()/2 - ch/2],
 		offset: [cw/2, ch/2],
 		width: 64, height: 64,
