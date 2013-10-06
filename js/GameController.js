@@ -167,6 +167,10 @@ var GameController = function(config){
 		rotationDeg: btnRotation 
 	});
 
+	this.getRotationDeg = function(){
+		return btnRotation;	
+	}
+
 	layer.add(container);
 	layer.add(center);
 

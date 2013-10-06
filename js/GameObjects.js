@@ -1,6 +1,6 @@
-var Rectangle = function(x, y, w, h){
-	return {x: x, y: y, w: w, h:h};
-};
+var Rectangle = function(x, y, w, h){ return {x: x, y: y, w: w, h:h}; };
+
+/* PROJECTILE CLASS*/
 var Projectile = function(config){
 	this.entityType = "Projectile";
 	var id = config.id;
@@ -11,25 +11,16 @@ var Projectile = function(config){
 	var radius = config.radius;
 	var position = (mage.Sprite).getPosition();
 	var startPosition = position;
-
 	var range = config.range || 300;
 	var moveSpeed = config.speed || 256;
 
 	var identifier = 0;
-	this.setIndentifier = function(i){
-		identifier = i;
-	}
-	this.getIdentifier = function(){
-		return identifier;
-	}
+	this.setIndentifier = function(i){ identifier = i; }
+	this.getIdentifier = function(){ return identifier; }
 
-	this.update = function(){
-		moveProjectile();
-	};
+	this.update = function(){ moveProjectile(); };
 
-	this.getBounds = function(){
-		return (new Rectangle(projectile.getX(), projectile.getY(), radius*2, radius*2));
-	};
+	this.getBounds = function(){ return (new Rectangle(projectile.getX(), projectile.getY(), radius*2, radius*2)); };
 
 	var getSpawnPosition = function(){
 		pos = [];
@@ -77,8 +68,8 @@ var Projectile = function(config){
 					}
 					
 					if(entity.getCurHP() <= 0){
+						Game.gameOver = true;
 						alert("Game Over! " + mage.getPlayerName() + " has won! Please restart the Game");
-						Game.pause();
 					}
 				}
 			}
@@ -106,7 +97,7 @@ var Projectile = function(config){
 		delete Game.Entities[identifier];
 	}
 }
-
+/* END OF PROJECTILE CLASS*/
 
 /* MAGE CLASS*/
 var Mage = function(config){
@@ -131,15 +122,24 @@ var Mage = function(config){
 
 	this.getPlayerName = function(){ return player; }
 
-	var attackCD = 500; //TEMP
-	var attackTimeStamp = -1; //TEMP
-
 	/* Mage stats */ //TEMP
+	var attackCD = 500; 
+	var attackTimeStamp = -1; 
 	this.damage = 2;
-	var maxHP = 10;
-	var curHP = maxHP;
-	this.setCurHP = function(hp){return curHP = hp;};
+	var attackCost = 1;
+	var dashCost = 10;
+	var maxHP = 10, maxMP = 10, maxEN = 10;
+	var curHP = maxHP, curMP = maxMP, curEN = maxEN;
+	var hpRegen = 0.1, mpRegen = 0.3, enRegen = 0.5;
+	var regenTimeStamp = 0; 
+	this.setCurHP = function(hp){
+		return curHP = (hp < 0) ? 0 : hp;
+	};
 	this.getCurHP = function(){return curHP;};
+	this.setCurMP = function(mp){return curMP = mp;};
+	this.getCurMP = function(){return curMP;};
+	this.setCurEN = function(en){return curEN = en;};
+	this.getCurEN = function(){return curEN;};
 
 	var identifier = 0;
 	this.setIndentifier = function(i){ identifier = i; }
@@ -164,24 +164,40 @@ var Mage = function(config){
 		rotationDeg: rotationDeg
 	});
 	var playerName = new Kinetic.Text({
-		x: sprite.getX() - (player.length*7.5/2),
-		y: sprite.getY() + (sprite.getHeight()/2) + 2,
+		x: sprite.getX(),
+		y: sprite.getY(),
 		text: player,
 		fill: color 
 	});
 
-	//TEMP
 	var hpBar = new Kinetic.Rect({
-		x: sprite.getX() - sprite.getOffsetX()/2,
-		y: sprite.getY() + sprite.getHeight()/2,
+		position: [0, 0],
 		width: sprite.getWidth()/2,
 		height: 2,
+		offset: [sprite.getWidth()/4, 1],
 		fill: "red"
+	});
+
+	var mpBar = new Kinetic.Rect({
+		position: [0, 0],
+		width: sprite.getWidth()/2,
+		height: 2,
+		offset: [sprite.getWidth()/4, 1],
+		fill: "blue"
+	});
+	var enBar = new Kinetic.Rect({
+		position: [0, 0],
+		width: sprite.getWidth()/2,
+		height: 2,
+		offset: [sprite.getWidth()/4, 1],
+		fill: "yellow",
 	});
 
 	layer.add(sprite);
 	layer.add(playerName);
 	layer.add(hpBar);
+	layer.add(mpBar);
+	layer.add(enBar);
 
 	this.Sprite = sprite;
 
@@ -189,25 +205,25 @@ var Mage = function(config){
 		if(gameController){
 			rotateSprite();
 			processAction(); 
-			moveMage();	
-			updateHPBar();
+			if(gameController.isUsed()){
+				moveMage();	
+			}
+			updateBars();
+			regenStats();
 
 			layer.draw();
 		}
 	};
 	var moveMage = function(){
-		if(gameController.isUsed()){
-			var deg = sprite.getRotation();
-			var delta = Game.delta;
-			var vx = sprite.getX() + (delta * moveSpeed * Math.sin(deg));
-			var vy = sprite.getY() - (delta * moveSpeed * Math.cos(deg));
+		var deg = sprite.getRotation();
+		var delta = Game.delta;
+		var vx = sprite.getX() + (delta * moveSpeed * Math.sin(deg));
+		var vy = sprite.getY() - (delta * moveSpeed * Math.cos(deg));
 
-			if(vx < 0){ vx = Game.screenWidth(); }else if(vx > Game.screenWidth()){ vx = 0;	}
-			if(vy < 0){ vy = Game.screenHeight(); }else if(vy > Game.screenHeight()){ vy = 0;	}
+		if(vx < 0){ vx = Game.screenWidth(); }else if(vx > Game.screenWidth()){ vx = 0;	}
+		if(vy < 0){ vy = Game.screenHeight(); }else if(vy > Game.screenHeight()){ vy = 0;	}
 
-			sprite.setPosition([vx, vy]);
-			resetNamePosition();
-		}
+		sprite.setPosition([vx, vy]);
 	};
 	var processAction = function(){
 		var b = gameController.buttonTapped(BUTTON.BOX);
@@ -220,19 +236,34 @@ var Mage = function(config){
 		if(c) { 
 			if(attackTimeStamp == 0){ attackTimeStamp = Game.time * 1000; }
 			if(attackTimeStamp == -1 || ( (Game.time * 1000) - attackTimeStamp > attackCD) ){
-				var bullet = new Projectile({
-					radius: 8,
-					fill: color,
-					layer: layer,
-					mageIdentifier: identifier,
-				});
-				Game.addEntity(bullet);
+				if(curMP - attackCost >= 0){
+					curMP = (curMP - attackCost < 0) ? 0 : curMP - attackCost;
+					var bullet = new Projectile({
+						radius: 8,
+						fill: color,
+						layer: layer,
+						mageIdentifier: identifier,
+					});
+					Game.addEntity(bullet);
+				}
 				attackTimeStamp = 0;
 			}
 		}
 
-		if(t) { moveSpeed = 768; }else{ moveSpeed = 96; }
-	}
+		if(t) { 
+			if(curEN > 0){
+				curEN -= (dashCost * Game.delta);
+				moveSpeed = 768; 
+				if(!gameController.isUsed()){
+					moveMage();
+				}
+			}else{
+				moveSpeed = 96; 
+			}
+		}else{ 
+			moveSpeed = 96;
+		}
+	};
 	var rotateSprite = function(){
 		direction = gameController.getDirection();
 		switch(direction){
@@ -249,13 +280,31 @@ var Mage = function(config){
 	};
 	var resetNamePosition = function(){
 		var x = sprite.getX() - (player.length*7.5/2);
-		var y = sprite.getY() + (sprite.getHeight()/2) + 2;
+		var y = sprite.getY() - ((sprite.getHeight()/2) + 8);
 		playerName.setPosition([x, y]);	
-	}
-	var updateHPBar = function(){
-		var x = sprite.getX() - sprite.getOffsetX()/2;
+	};
+	var updateBars = function(){
+		var x = sprite.getX();
 		var y = sprite.getY() + sprite.getHeight()/2;
-		hpBar.setWidth((curHP/maxHP) * (sprite.getWidth()/2));
+		var w = (sprite.getWidth()/2);
+		hpBar.setWidth((curHP/maxHP) * w);
 		hpBar.setPosition([x, y]);	
+		y +=2;
+		mpBar.setWidth((curMP/maxMP) * w);
+		mpBar.setPosition([x, y]);	
+		y +=2;
+		enBar.setWidth((curEN/maxEN) * w);
+		enBar.setPosition([x, y]);	
+		resetNamePosition();
+	};
+	var regenStats = function(){
+		if(regenTimeStamp == 0) regenTimeStamp = Game.time * 1000;
+		else if((Game.time*1000) - regenTimeStamp > 1000){
+			if(curHP < maxHP) curHP += hpRegen;
+			if(curMP < maxMP) curMP += mpRegen;
+			if(curEN < maxEN) curEN += enRegen;
+			regenTimeStamp = 0;
+		}
 	};
 };
+/* END OF PROJECTILE CLASS */

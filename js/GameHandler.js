@@ -1,5 +1,6 @@
 window.Game = window.Game || {};
 
+Game.gameOver = false;
 Game.Sources = {};
 Game.Sprites = {};
 Game.States = {};
@@ -89,9 +90,11 @@ Game.loadImages = function(sources, callback) {
 
 Game.core = {
 	frame: function() {
-		Game.core.setDelta();
-		Game.core.update();
-		Game.core.animationFrame = window.requestAnimFrame(Game.core.frame);
+		if(!Game.gameOver){
+			Game.core.setDelta();
+			Game.core.update();
+			Game.core.animationFrame = window.requestAnimFrame(Game.core.frame);
+		}
 	},
  
 	setDelta: function() {
