@@ -5,10 +5,13 @@ Game.Sprites = {};
 Game.States = {};
 Game.update = function(){};
 Game.Stage = null;
-Game.Entities = [];
+Game.Entities = {};
 
+var entityCounter = 0;
 Game.addEntity = function(entity){
-	if(entity) (Game.Entities).push(entity);
+	Game.Entities[entityCounter] = entity;
+	entity.setIndentifier(entityCounter);
+	entityCounter++;
 }
 
 Game.addState = function(state_name, state){

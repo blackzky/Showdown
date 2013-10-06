@@ -10,9 +10,17 @@ var Projectile = function(config){
 	var position = mage.getPosition();
 	var startPosition = position;
 
-	var index = 0;
 	var range = config.range || 300;
 	var moveSpeed = config.speed || 256;
+
+	var identifier = 0;
+	this.setIndentifier = function(i){
+		identifier = i;
+	}
+
+	this.update = function(){
+		moveProjectile();
+	};
 
 	var projectile = new Kinetic.Circle({
 		position: position,
@@ -25,15 +33,9 @@ var Projectile = function(config){
 	});
 
 	layer.add(projectile);
+	projectile.moveDown();
 
-	var startTime = 0;//TEMP
-	this.update = function(){
-		//if(startTime == 0) startTime = Game.time;
-		//if(Game.time - startTime > 3 && config.remove){ //TEMP
-			//Game.Entities.splice(index, 1);
-			//projectile.destroy();	
-			//Game.Stage.draw();
-		//}
+	var moveProjectile = function(){
 		var deg = projectile.getRotation();
 		var delta = Game.delta;
 		var vx = projectile.getX() + (delta * moveSpeed * Math.sin(deg));
@@ -45,10 +47,11 @@ var Projectile = function(config){
 		if(distance < range){
 			projectile.setPosition([vx, vy]);
 		}else{
-			//destroy	
+			projectile.destroy();
+			delete Game.Entities[identifier];
 		}
+	};
 
-	}
 }
 
 var Mage = function(config){
@@ -70,9 +73,13 @@ var Mage = function(config){
 	var moveSpeed = 96;
 	var spriteRotation = config.rotationDeg;
 
-	var attackCD = 1000; //TEMP
-	var attackTimeStamp = 0; //TEMP
+	var attackCD = 500; //TEMP
+	var attackTimeStamp = -1; //TEMP
 
+	var identifier = 0;
+	this.setIndentifier = function(i){
+		identifier = i;
+	}
 	var sprite = new Kinetic.Sprite({
 		x: position[0], y: position[1],
 		offset: [config.offset[0], config.offset[1]],
@@ -132,7 +139,7 @@ var Mage = function(config){
 		if(x) { }
 		if(c) { 
 			if(attackTimeStamp == 0){ attackTimeStamp = Game.time * 1000; }
-			if((Game.time * 1000) - attackTimeStamp > attackCD){
+			if(attackTimeStamp == -1 || ( (Game.time * 1000) - attackTimeStamp > attackCD) ){
 				var bullet = new Projectile({
 					radius: 8,
 					fill: color,
