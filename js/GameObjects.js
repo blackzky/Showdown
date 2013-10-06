@@ -22,8 +22,28 @@ var Projectile = function(config){
 		moveProjectile();
 	};
 
+	var getSpawnPosition = function(){
+		pos = [];
+		pos[0] = position.x; 
+		pos[1] = position.y;
+		var rot = mage.getRotationDeg();
+		var w = mage.getWidth()/2;
+		var h = mage.getHeight()/2;
+		var r = (Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2)))/2;
+		switch(rot){
+			case 315: pos[0] -= (r); pos[1] -= (r); break;
+			case 0: pos[1] -= (h); break;
+			case 45: pos[0] += (r); pos[1] -= (r); break;
+			case 270: pos[0] -= (w);  break;
+			case 90: pos[0] += (w);  break;
+			case 225: pos[0] -= (r); pos[1] += (r); break;
+			case 135: pos[0] += (r); pos[1] += (r); break;
+			case 180: pos[1] += (h); break;
+		}
+		return pos;
+	}
 	var projectile = new Kinetic.Circle({
-		position: position,
+		position: getSpawnPosition(),
 		radius: config.radius,
 		rotationDeg: mage.getRotationDeg(),
 		fill: config.fill || "black",

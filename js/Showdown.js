@@ -14,9 +14,7 @@ window.onload = function(){
 	handleEvents();
 
 	Game.setUpdate(function(){
-		for(var i in Game.Entities){
-			Game.Entities[i].update();	
-		}
+
 	});
 
 	Game.start({container :"container"});

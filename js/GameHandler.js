@@ -92,6 +92,9 @@ Game.core = {
 		Game.core.then = Game.core.now;
 	},
 	update: function(){ 
+		for(var i in Game.Entities){
+			Game.Entities[i].update();	
+		}
 		Game.update();
 	}
 };
