@@ -60,7 +60,7 @@ menu.setInit(function(){
 		player: "ken",
 		color: "blue",
 		rotationDeg: 90, 
-		direction: DIRECTION.EAST
+		direction: DIRECTION.EAST,
 	});
 
 	var characterTwo = new Mage({
