@@ -2,12 +2,14 @@ var Rectangle = function(x, y, w, h){
 	return {x: x, y: y, w: w, h:h};
 };
 var Projectile = function(config){
+	this.entityType = "Projectile";
 	var id = config.id;
 	var tag = config.tag;
 	var layer = config.layer;
 	var rotationDeg = config.rotationDeg;
-	var mage = config.mage;
-	var position = mage.getPosition();
+	var mage = Game.Entities[config.mageIdentifier];
+	var radius = config.radius;
+	var position = (mage.Sprite).getPosition();
 	var startPosition = position;
 
 	var range = config.range || 300;
@@ -17,18 +19,25 @@ var Projectile = function(config){
 	this.setIndentifier = function(i){
 		identifier = i;
 	}
+	this.getIdentifier = function(){
+		return identifier;
+	}
 
 	this.update = function(){
 		moveProjectile();
+	};
+
+	this.getBounds = function(){
+		return (new Rectangle(projectile.getX(), projectile.getY(), radius*2, radius*2));
 	};
 
 	var getSpawnPosition = function(){
 		pos = [];
 		pos[0] = position.x; 
 		pos[1] = position.y;
-		var rot = mage.getRotationDeg();
-		var w = mage.getWidth()/2;
-		var h = mage.getHeight()/2;
+		var rot = mage.Sprite.getRotationDeg();
+		var w = mage.Sprite.getWidth()/2;
+		var h = mage.Sprite.getHeight()/2;
 		var r = (Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2)))/2;
 		switch(rot){
 			case 315: pos[0] -= (r); pos[1] -= (r); break;
@@ -42,10 +51,11 @@ var Projectile = function(config){
 		}
 		return pos;
 	}
+
 	var projectile = new Kinetic.Circle({
 		position: getSpawnPosition(),
-		radius: config.radius,
-		rotationDeg: mage.getRotationDeg(),
+		radius: radius,
+		rotationDeg: mage.Sprite.getRotationDeg(),
 		fill: config.fill || "black",
 		listening: false,
 		id: id, 
@@ -53,7 +63,27 @@ var Projectile = function(config){
 	});
 
 	layer.add(projectile);
-	projectile.moveDown();
+	
+	var checkCollision = function(){
+		var entity;
+		var pBounds = new Rectangle(projectile.getX(), projectile.getY(), radius*2, radius*2);
+		for(var i in Game.Entities){
+			entity = Game.Entities[i];
+			if(entity.entityType == "Mage"){
+				if(entity.getIdentifier() != mage.getIdentifier() && Util.collide(pBounds, entity.getBounds())){
+					destroyProjectile();
+					if(entity.curHP > 0){
+						entity.curHP = entity.curHP - mage.damage;
+						console.log(entity.Sprite.getId() + ": HP: "+ entity.curHP);
+					}
+					
+					if(enity.curHP <= 0){
+						console.log(entity.Sprite.getId() + " is dead");
+					}
+				}
+			}
+		}
+	}
 
 	var moveProjectile = function(){
 		var deg = projectile.getRotation();
@@ -65,16 +95,22 @@ var Projectile = function(config){
 		var dy = Math.abs(vy - startPosition.y);
 		var distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 		if(distance < range){
+			checkCollision();
 			projectile.setPosition([vx, vy]);
 		}else{
-			projectile.destroy();
-			delete Game.Entities[identifier];
+			destroyProjectile();
 		}
 	};
-
+	var destroyProjectile = function(){
+		projectile.destroy();
+		delete Game.Entities[identifier];
+	}
 }
 
+
+/* MAGE CLASS*/
 var Mage = function(config){
+	this.entityType = "Mage";
 	var id = config.id || "character";
 	var position = [(config.position[0] || 0), (config.position[1]) || 0];
 	var image = config.image || game.sprites.character; 
@@ -93,13 +129,29 @@ var Mage = function(config){
 	var moveSpeed = 96;
 	var spriteRotation = config.rotationDeg;
 
+	this.getPlayerName = function(){
+		return player;
+	}
 	var attackCD = 500; //TEMP
 	var attackTimeStamp = -1; //TEMP
+
+	/* Mage stats */ //TEMP
+	this.damage = 2;
+	var maxHP = 10;
+	this.curHP = maxHP;
 
 	var identifier = 0;
 	this.setIndentifier = function(i){
 		identifier = i;
 	}
+	this.getIdentifier = function(){
+		return identifier;
+	}
+
+	this.getBounds = function(){
+		return (new Rectangle(sprite.getX() - sprite.getOffsetX(), sprite.getY() - sprite.getOffsetY(), config.width, config.height));
+	}
+
 	var sprite = new Kinetic.Sprite({
 		x: position[0], y: position[1],
 		offset: [config.offset[0], config.offset[1]],
@@ -164,7 +216,7 @@ var Mage = function(config){
 					radius: 8,
 					fill: color,
 					layer: layer,
-					mage: sprite,
+					mageIdentifier: identifier,
 				});
 				Game.addEntity(bullet);
 				attackTimeStamp = 0;

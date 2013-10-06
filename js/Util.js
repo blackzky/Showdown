@@ -18,3 +18,13 @@ Util.pointInBox = function(point, box){
 		bh = box.h;
 	return (px > bx && px < bx+bw && py > by && py <by+bh);
 }
+
+Util.collide = function(e1, e2){
+	return( (e1.x >= e2.x && e1.x <= (e2.x + e2.w) && e1.y >= e2.y && e1.y <= (e2.y + e2.h)) ||
+			((e1.x+e1.w) >= e2.x && (e1.x+e1.w) <= (e2.x + e2.w) && e1.y >= e2.y && e1.y <= (e2.y + e2.h)) || 
+			((e1.x+e1.w) >= e2.x && (e1.x+e1.w) <= (e2.x + e2.w) && (e1.y+e1.h) >= e2.y && (e1.y+e1.h) <= (e2.y + e2.h)) ||
+			(e1.x >= e2.x && e1.x <= (e2.x + e2.w) && (e1.y+e1.h) >= e2.y && (e1.y+e1.h) <= (e2.y + e2.h))
+	);
+
+}
+
