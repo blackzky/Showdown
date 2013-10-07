@@ -23,8 +23,27 @@
     <script type="text/javascript" src="js/Util.js"></script>
     <script type="text/javascript" src="js/GameController.js"></script>
     <script type="text/javascript" src="js/GameObjects.js"></script>
-    <script type="text/javascript" src="js/Showdown.js"></script>
-
     <script type="text/javascript" src="js/States.js"></script>
+
+    <script type="text/javascript" src="js/Showdown.js"></script>
+    <script type="text/javascript">
+        var app = {
+            initialize: function() {
+                this.bindEvents();
+            },
+
+            bindEvents: function() {
+                document.addEventListener('deviceready', this.onDeviceReady, false);
+            },
+            onDeviceReady: function() {
+                app.receivedEvent('deviceready');
+                alert("device ready");
+            },
+            
+            receivedEvent: function(id) {
+               
+            }
+        };
+    </script>
 </body>
 </html>
