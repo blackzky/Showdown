@@ -6,8 +6,9 @@ var app = {
    }, bindEvents: function(){
         document.addEventListener('deviceready', this.onDeviceReady, false); 
     }, onDeviceReady: function(){
-        app.receiveEvent('deviceready'); 
+        //app.receiveEvent('deviceready'); 
         
+      setTimeout(function(){
         Game.addSource("dPadContainer", "img/d-pad-container.png"); 
 	Game.addSource("dPadCenter", "img/d-pad-center.png");
 	Game.addSource("character", "img/character.png");
@@ -17,6 +18,9 @@ var app = {
 	Game.addSource("triangle", "img/triangle.png");
 	Game.addState("Menu", menu);
 	Game.start({container :"container"});
+alert('loaded');
+        },5000); 
+ 
     } 
 };
 window.onload = function(){
